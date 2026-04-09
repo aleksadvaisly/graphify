@@ -17,7 +17,7 @@ skills: $(PYTHON) ## Install skill + register in CLAUDE.md
 
 graph: $(PYTHON) ## Build knowledge graph (usage: make graph [/path/to/project])
 	$(eval _path := $(or $(filter-out graph,$(MAKECMDGOALS)),.))
-	claude -p "/graphify $(_path)" --allowedTools "Bash Edit Write Read Glob Grep Agent Skill"
+	claude -p "/graphify $(_path)" --allowedTools "Bash Edit Write Read Glob Grep Agent Skill" --dangerously-skip-permissions
 	@echo "\n  Open $(abspath $(_path))/graphify-out/graph.html in a browser."
 
 # Accept any path as a no-op target so make doesn't complain about missing rules
