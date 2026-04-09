@@ -57,6 +57,17 @@ If no path was given, use `.` (current directory). Do not ask the user for a pat
 
 Follow these steps in order. Do not skip steps.
 
+**Debug logging (MANDATORY):** Every bash block in every step MUST start with a START log line and end with a DONE log line. This writes timestamped phase markers to `graphify-out/debug.log` so headless runs can be monitored via `tail -f graphify-out/debug.log`.
+
+Since each Bash tool call is a fresh shell, define the helper inline at the top of every bash block:
+```bash
+_glog() { echo "$(date '+%Y-%m-%d %H:%M:%S') [$1] $2" >> graphify-out/debug.log; }
+_glog "START step_name" "key1=val1"
+# ... actual work ...
+_glog "DONE step_name" "nodes=123 edges=456"
+```
+Include relevant metrics (file counts, node counts, cache hits, etc.) in the info string of the DONE call.
+
 ### Step 1 - Ensure graphify is installed
 
 ```bash
@@ -81,6 +92,11 @@ fi
 # Write interpreter path for all subsequent steps
 "$PYTHON" -c "import sys; open('graphify-out/.graphify_python', 'w').write(sys.executable)"
 mkdir -p graphify-out
+
+# Initialize debug log and logging helper
+_glog() { echo "$(date '+%Y-%m-%d %H:%M:%S') [$1] $2" >> graphify-out/debug.log; }
+echo "$(date '+%Y-%m-%d %H:%M:%S') [INIT] graphify pipeline | path=INPUT_PATH python=$PYTHON" > graphify-out/debug.log
+_glog "DONE step1_install" "python=$PYTHON"
 ```
 
 If the import succeeds, print nothing and move straight to Step 2.
